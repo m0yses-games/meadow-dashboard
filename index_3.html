@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1440, initial-scale=1" />
+<title>Meadow — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          bg:        '#0a0a0a',
+          surface:   '#171717',
+          border:    '#262626',
+          divider:   '#404040',
+          muted:     '#737373',
+          subtle:    '#a3a3a3',
+          fg:        '#fafafa',
+          lime:      '#d4fe32',
+          counter:   '#525252',
+        },
+        fontFamily: {
+          sans: ['Geist', 'system-ui', 'sans-serif'],
+        },
+        boxShadow: {
+          xs: '0 1px 2px 0 rgba(0,0,0,0.05)',
+          sm: '0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px 0 rgba(0,0,0,0.1)',
+        },
+      },
+    },
+  };
+</script>
+<style>
+  html, body { background: #0a0a0a; font-family: 'Geist', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  /* Lucide icons sizing baseline */
+  svg.lucide { stroke-width: 2; }
+  /* Custom checkbox: transparent bg, lime check when checked */
+  input[type="checkbox"] {
+    -webkit-appearance: none;
+    appearance: none;
+    background-color: transparent;
+    border: 1px solid #404040;
+    border-radius: 4px;
+    width: 16px;
+    height: 16px;
+    display: inline-grid;
+    place-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  input[type="checkbox"]::before {
+    content: "";
+    width: 10px;
+    height: 10px;
+    transform: scale(0);
+    transition: transform 80ms ease-in-out;
+    background-color: #d4fe32;
+    clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+  }
+  input[type="checkbox"]:checked::before {
+    transform: scale(1);
+  }
+</style>
+</head>
+<body class="text-fg">
+
+<div class="flex min-h-screen w-full">
+
+  <!-- =================== SIDEBAR =================== -->
+  <aside class="flex h-screen w-[265px] shrink-0 flex-col justify-between border-r border-border bg-surface sticky top-0">
+    <!-- Sidebar header -->
+    <div class="relative flex flex-col p-2">
+      <button id="brand-trigger" type="button" aria-haspopup="menu" aria-expanded="false" class="flex min-h-[36px] w-full items-center gap-3 rounded-md py-2 pl-4 pr-3 text-left hover:bg-border/60">
+        <div id="brand-trigger-avatar" class="flex h-8 w-8 -m-1.5 items-center justify-center rounded-full bg-fg text-[14px] font-semibold text-[#0a0a0a]">JB</div>
+        <div class="flex flex-1 flex-col justify-center">
+          <div id="brand-trigger-name" class="text-[14px] leading-5 text-fg">JetBrains</div>
+          <div class="text-[12px] leading-4 text-subtle">Manager</div>
+        </div>
+        <span class="text-subtle">
+          <svg class="lucide h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>
+        </span>
+      </button>
+
+      <!-- Brand menu popover (opens to the right of the sidebar) -->
+      <div id="brand-menu" role="menu" aria-labelledby="brand-trigger" class="fixed left-[265px] top-2 z-50 hidden w-[240px] flex-col rounded-lg border border-border bg-surface p-0.5 shadow-[0_4px_6px_rgba(0,0,0,0.1),0_2px_4px_rgba(0,0,0,0.1)] ml-2">
+        <div class="px-3 py-[7.5px] text-[14px] font-medium leading-5 text-subtle">Brands</div>
+        <button type="button" data-brand="JB" data-name="JetBrains" class="brand-option flex h-10 items-center gap-3 rounded-md px-3 py-[7.5px] text-left hover:bg-border/60" role="menuitem">
+          <span class="flex h-8 w-8 -m-1.5 items-center justify-center rounded-full bg-fg text-[14px] font-semibold text-[#0a0a0a]">JB</span>
+          <span class="flex-1 text-[14px] leading-5 text-fg">JetBrains</span>
+          <span class="text-[14px] leading-5 text-subtle">⌘1</span>
+        </button>
+        <button type="button" data-brand="FW" data-name="FlowWow" class="brand-option flex h-10 items-center gap-3 rounded-md px-3 py-[7.5px] text-left hover:bg-border/60" role="menuitem">
+          <span class="flex h-8 w-8 -m-1.5 items-center justify-center rounded-full bg-fg text-[14px] font-semibold text-[#0a0a0a]">FW</span>
+          <span class="flex-1 text-[14px] leading-5 text-fg">FlowWow</span>
+          <span class="text-[14px] leading-5 text-subtle">⌘2</span>
+        </button>
+        <button type="button" data-brand="ES" data-name="EasyStaff" class="brand-option flex h-10 items-center gap-3 rounded-md px-3 py-[7.5px] text-left hover:bg-border/60" role="menuitem">
+          <span class="flex h-8 w-8 -m-1.5 items-center justify-center rounded-full bg-fg text-[14px] font-semibold text-[#0a0a0a]">ES</span>
+          <span class="flex-1 text-[14px] leading-5 text-fg">EasyStaff</span>
+          <span class="text-[14px] leading-5 text-subtle">⌘3</span>
+        </button>
+        <div class="my-1 h-px w-full bg-border"></div>
+        <button type="button" id="add-brand" class="flex h-10 items-center gap-3 rounded-md px-3 py-[7.5px] text-left hover:bg-border/60" role="menuitem">
+          <span class="flex h-5 w-5 items-center justify-center text-fg">
+            <svg class="lucide h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+          </span>
+          <span class="flex-1 text-[14px] leading-5 text-fg">Add new brand</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Sidebar content -->
+    <div class="flex flex-1 flex-col justify-between">
+      <!-- Group: Platform -->
+      <div class="flex flex-col gap-0.5 p-2">
+        <div class="px-3 py-2 text-[12px] font-semibold leading-4 text-subtle">Platform</div>
+
+        <a href="#" class="flex h-8 items-center gap-2 rounded-md bg-border px-3 py-1 text-[14px] text-fg">
+          <svg class="lucide h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12c.552 0 1.005-.449.95-.998a10 10 0 0 0-8.953-8.951c-.55-.055-.998.398-.998.95v8a1 1 0 0 0 1 1z"/><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/></svg>
+          Dashboard
+        </a>
+
+        <a href="#" class="flex h-8 items-center gap-2 rounded-md px-3 py-1 text-[14px] text-fg hover:bg-border/60">
+          <svg class="lucide h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="6" height="14" rx="1"/><rect x="15" y="5" width="6" height="14" rx="1"/></svg>
+          Campaigns
+        </a>
+
+        <a href="#" class="flex h-8 items-center gap-2 rounded-md px-3 py-1 text-[14px] text-fg hover:bg-border/60">
+          <svg class="lucide h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Creators
+        </a>
+      </div>
+
+      <!-- Group: Bottom -->
+      <div class="flex flex-col gap-0.5 p-2">
+        <a href="#" class="flex h-8 items-center gap-2 rounded-md px-3 py-1 text-[14px] text-fg hover:bg-border/60">
+          <svg class="lucide h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2"/><circle cx="12" cy="12" r="3"/></svg>
+          Settings
+        </a>
+        <a href="#" class="flex h-8 items-center gap-2 rounded-md px-3 py-1 text-[14px] text-fg hover:bg-border/60">
+          <svg class="lucide h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+          Get Help
+        </a>
+        <a href="#" class="flex h-8 items-center gap-2 rounded-md px-3 py-1 text-[14px] text-fg hover:bg-border/60">
+          <svg class="lucide h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          Search
+        </a>
+      </div>
+    </div>
+
+    <!-- Sidebar footer -->
+    <div class="flex flex-col p-2">
+      <div class="flex min-h-[36px] w-full items-center gap-3 rounded-md py-2 pl-4 pr-3">
+        <img src="https://i.pravatar.cc/64?img=12" alt="" class="h-8 w-8 -m-1.5 rounded-full object-cover" />
+        <div class="flex flex-1 flex-col justify-center">
+          <div class="text-[14px] leading-5 text-fg">Dmitry Sidenko</div>
+          <div class="text-[12px] leading-4 text-subtle"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="6e0a0b1d070a0b0005012e0a0f400d0103">[email&#160;protected]</a></div>
+        </div>
+        <button class="text-subtle hover:text-fg" aria-label="Account menu">
+          <svg class="lucide h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- =================== MAIN =================== -->
+  <main class="flex min-w-0 flex-1 flex-col">
+
+    <!-- Header -->
+    <header class="flex h-[68px] w-full shrink-0 items-center justify-between border-b border-border px-5">
+      <div class="flex items-center gap-3">
+        <button class="flex min-h-6 min-w-6 items-center justify-center rounded p-1 text-fg hover:bg-border/60" aria-label="Toggle sidebar">
+          <svg class="lucide h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg>
+        </button>
+        <div class="h-4 w-px bg-divider"></div>
+        <span class="text-[14px] text-fg">Dashboard</span>
+        <span class="text-[14px] text-subtle">Updated 6 hours ago</span>
+      </div>
+      <button class="flex min-h-8 items-center gap-1.5 rounded-lg border border-divider bg-transparent px-3 py-1.5 text-[14px] font-medium text-fg shadow-xs hover:bg-border/40">
+        <svg class="lucide h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+        Export
+      </button>
+    </header>
+
+    <!-- Content -->
+    <div class="flex flex-1 flex-col gap-5 px-5 pt-5 pb-8">
+
+      <!-- =================== OVERALL PERFORMANCE =================== -->
+      <section class="flex w-full flex-col gap-10 rounded-lg border border-border bg-surface p-6">
+        <!-- Header -->
+        <div class="flex items-center justify-between">
+          <h2 class="text-[16px] font-medium leading-6 text-fg">Overall Performance</h2>
+          <div class="flex items-center gap-2">
+            <button class="flex h-8 w-[156px] items-center gap-1.5 rounded-lg border border-divider px-2 text-[14px] text-fg shadow-xs hover:bg-border/40">
+              <svg class="lucide h-4 w-4 text-fg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <span class="flex-1 text-left">All Time</span>
+              <svg class="lucide h-4 w-4 text-fg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div class="relative">
+              <button id="widgets-trigger" type="button" aria-haspopup="menu" aria-expanded="false" class="flex h-8 w-[172px] items-center gap-1.5 rounded-lg border border-divider px-2 text-[14px] text-fg shadow-xs hover:bg-border/40">
+                <svg class="lucide h-4 w-4 text-fg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M12 3v18"/></svg>
+                <span class="flex-1 text-left">Manage Widgets</span>
+                <svg class="lucide h-4 w-4 text-fg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+              </button>
+              <div id="widgets-menu" role="menu" aria-labelledby="widgets-trigger" class="absolute right-0 top-[36px] z-50 hidden w-[260px] flex-col rounded-lg border border-divider bg-surface p-0.5 shadow-[0_4px_6px_rgba(0,0,0,0.1),0_2px_4px_rgba(0,0,0,0.1)]">
+                <label class="widget-option flex min-h-9 cursor-pointer items-center gap-3 rounded-md px-3 py-[7.5px] hover:bg-border/60" data-widget="total-spend" draggable="true">
+                  <span class="drag-handle flex h-5 w-5 cursor-grab items-center justify-center text-subtle active:cursor-grabbing">
+                    <svg class="lucide h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="6" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="18" r="1"/><circle cx="15" cy="6" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="18" r="1"/></svg>
+                  </span>
+                  <input type="checkbox" class="widget-checkbox h-4 w-4 shrink-0 cursor-pointer rounded-sm border border-divider bg-transparent accent-lime" checked />
+                  <span class="flex-1 text-[14px] leading-5 text-fg">Total Spend</span>
+                </label>
+                <label class="widget-option flex min-h-9 cursor-pointer items-center gap-3 rounded-md px-3 py-[7.5px] hover:bg-border/60" data-widget="total-reach" draggable="true">
+                  <span class="drag-handle flex h-5 w-5 cursor-grab items-center justify-center text-subtle active:cursor-grabbing">
+                    <svg class="lucide h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="6" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="18" r="1"/><circle cx="15" cy="6" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="18" r="1"/></svg>
+                  </span>
+                  <input type="checkbox" class="widget-checkbox h-4 w-4 shrink-0 cursor-pointer rounded-sm border border-divider bg-transparent accent-lime" checked />
+                  <span class="flex-1 text-[14px] leading-5 text-fg">Total Reach</span>
+                </label>
+                <label class="widget-option flex min-h-9 cursor-pointer items-center gap-3 rounded-md px-3 py-[7.5px] hover:bg-border/60" data-widget="average-er" draggable="true">
+                  <span class="drag-handle flex h-5 w-5 cursor-grab items-center justify-center text-subtle active:cursor-grabbing">
+                    <svg class="lucide h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="6" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="18" r="1"/><circle cx="15" cy="6" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="18" r="1"/></svg>
+                  </span>
+                  <input type="checkbox" class="widget-checkbox h-4 w-4 shrink-0 cursor-pointer rounded-sm border border-divider bg-transparent accent-lime" checked />
+                  <span class="flex-1 text-[14px] leading-5 text-fg">Average ER</span>
+                </label>
+                <label class="widget-option flex min-h-9 cursor-pointer items-center gap-3 rounded-md px-3 py-[7.5px] hover:bg-border/60" data-widget="geography" draggable="true">
+                  <span class="drag-handle flex h-5 w-5 cursor-grab items-center justify-center text-subtle active:cursor-grabbing">
+                    <svg class="lucide h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="6" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="18" r="1"/><circle cx="15" cy="6" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="18" r="1"/></svg>
+                  </span>
+                  <input type="checkbox" class="widget-checkbox h-4 w-4 shrink-0 cursor-pointer rounded-sm border border-divider bg-transparent accent-lime" />
+                  <span class="flex-1 text-[14px] leading-5 text-fg">Geography of placements</span>
+                </label>
+                <label class="widget-option flex min-h-9 cursor-pointer items-center gap-3 rounded-md px-3 py-[7.5px] hover:bg-border/60" data-widget="creators-count" draggable="true">
+                  <span class="drag-handle flex h-5 w-5 cursor-grab items-center justify-center text-subtle active:cursor-grabbing">
+                    <svg class="lucide h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="6" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="18" r="1"/><circle cx="15" cy="6" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="18" r="1"/></svg>
+                  </span>
+                  <input type="checkbox" class="widget-checkbox h-4 w-4 shrink-0 cursor-pointer rounded-sm border border-divider bg-transparent accent-lime" />
+                  <span class="flex-1 text-[14px] leading-5 text-fg">Total number of creators</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- KPI Cards -->
+        <div id="kpi-cards" class="flex w-full items-stretch gap-6">
+
+          <!-- Total Spend + Chart -->
+          <div data-widget="total-spend" class="flex h-[122px] min-w-[517px] flex-1 items-center gap-6">
+            <div class="flex w-[175px] flex-col gap-5">
+              <div class="flex flex-col gap-2">
+                <div class="text-[14px] text-subtle">Total Spend</div>
+                <div class="text-[30px] font-semibold leading-[30px] tracking-[-1px] text-lime">$140,250.00</div>
+              </div>
+              <div class="flex flex-col gap-1">
+                <div class="flex items-center gap-2 text-[14px] text-fg">
+                  +12.5% vs last month
+                  <svg class="lucide h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+                </div>
+                <div class="text-[14px] text-subtle">Spending needs attention</div>
+              </div>
+            </div>
+            <!-- Area chart -->
+            <div class="h-full flex-1">
+              <svg viewBox="0 0 320 122" preserveAspectRatio="none" class="h-full w-full" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="lime-fill" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0%" stop-color="#d4fe32" stop-opacity="0.55"/>
+                    <stop offset="100%" stop-color="#d4fe32" stop-opacity="0.05"/>
+                  </linearGradient>
+                </defs>
+                <path d="M0,95 C25,90 40,30 80,28 C115,26 130,80 165,82 C200,84 215,55 250,48 C285,42 305,70 320,72 L320,122 L0,122 Z" fill="url(#lime-fill)"/>
+                <path d="M0,95 C25,90 40,30 80,28 C115,26 130,80 165,82 C200,84 215,55 250,48 C285,42 305,70 320,72" fill="none" stroke="#d4fe32" stroke-width="2"/>
+              </svg>
+            </div>
+          </div>
+
+          <div data-divider-for="total-reach" class="w-px self-stretch bg-divider"></div>
+
+          <!-- Total Reach -->
+          <div data-widget="total-reach" class="flex flex-1 flex-col gap-5">
+            <div class="flex flex-col gap-2">
+              <div class="text-[14px] text-subtle">Total Reach</div>
+              <div class="text-[30px] font-semibold leading-[30px] tracking-[-1px] text-lime">548,743</div>
+            </div>
+            <div class="flex flex-col gap-1">
+              <div class="flex items-center gap-2 text-[14px] text-fg">
+                -20% vs last month
+                <svg class="lucide h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></svg>
+              </div>
+              <div class="text-[14px] text-subtle">Below expectations</div>
+            </div>
+          </div>
+
+          <div data-divider-for="average-er" class="w-px self-stretch bg-divider"></div>
+
+          <!-- Average ER -->
+          <div data-widget="average-er" class="flex flex-1 flex-col gap-5">
+            <div class="flex flex-col gap-2">
+              <div class="text-[14px] text-subtle">Average ER</div>
+              <div class="text-[30px] font-semibold leading-[30px] tracking-[-1px] text-lime">4.16%</div>
+            </div>
+            <div class="flex flex-col gap-1">
+              <div class="flex items-center gap-2 text-[14px] text-fg">
+                +0.6% vs last month
+                <svg class="lucide h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+              </div>
+              <div class="text-[14px] text-subtle">Engagement exceed targets</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================== CAMPAIGNS =================== -->
+      <section class="flex w-full flex-col gap-4">
+
+        <!-- Tabs row -->
+        <div class="flex w-full items-center justify-between">
+          <div class="flex items-center rounded-[10px] bg-surface p-[3px]">
+            <button class="flex min-h-[29px] items-center gap-1.5 rounded-[10px] border border-divider px-3 py-1 text-[14px] font-medium text-fg shadow-sm">
+              Active campaigns
+              <span class="flex h-4 min-w-4 items-center justify-center rounded-[10px] bg-counter px-1 text-[12px] font-semibold text-fg">4</span>
+            </button>
+            <button class="flex min-h-[29px] items-center gap-1.5 rounded-[10px] px-3 py-1 text-[14px] font-medium text-subtle hover:text-fg">
+              Completed
+              <span class="flex h-4 min-w-4 items-center justify-center rounded-[10px] bg-counter px-1 text-[12px] font-semibold text-fg">19</span>
+            </button>
+            <button class="flex min-h-[29px] items-center gap-1.5 rounded-[10px] px-3 py-1 text-[14px] font-medium text-subtle hover:text-fg">
+              Scheduled
+              <span class="flex h-4 min-w-4 items-center justify-center rounded-[10px] bg-counter px-1 text-[12px] font-semibold text-fg">2</span>
+            </button>
+          </div>
+          <button class="flex min-h-8 items-center gap-1.5 rounded-lg border border-divider px-3 py-1.5 text-[14px] font-medium text-fg shadow-xs hover:bg-border/40">
+            <svg class="lucide h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+            Start campaign
+          </button>
+        </div>
+
+        <!-- Campaign cards -->
+        <div class="grid w-full grid-cols-4 gap-4">
+          <!-- Card template -->
+          <!-- Card 1 -->
+          <article class="flex flex-col gap-5 rounded-lg border border-border bg-surface p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-[16px] font-medium leading-6 text-fg">JB TikTok</h3>
+              <button class="flex min-h-6 items-center rounded-lg border border-divider px-2 py-[3px] text-[12px] font-medium text-fg shadow-xs hover:bg-border/40">Details</button>
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <div class="flex items-center gap-5">
+                <div class="text-[48px] font-semibold leading-[48px] tracking-[-1.5px] text-lime">75%</div>
+                <div class="text-[16px] leading-6 text-fg">$4,200<br><span class="text-subtle">/ $8,000</span></div>
+              </div>
+              <div class="text-[14px] text-subtle">Reach achieved</div>
+            </div>
+            <div class="relative h-2 w-full overflow-hidden rounded-md bg-divider">
+              <div class="absolute inset-y-0 left-0 rounded-md bg-lime" style="width:75%"></div>
+            </div>
+          </article>
+
+          <!-- Card 2 -->
+          <article class="flex flex-col gap-5 rounded-lg border border-border bg-surface p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-[16px] font-medium leading-6 text-fg">JB YouTube</h3>
+              <button class="flex min-h-6 items-center rounded-lg border border-divider px-2 py-[3px] text-[12px] font-medium text-fg shadow-xs hover:bg-border/40">Details</button>
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <div class="flex items-center gap-5">
+                <div class="text-[48px] font-semibold leading-[48px] tracking-[-1.5px] text-lime">12%</div>
+                <div class="text-[16px] leading-6 text-fg">$1,450<br><span class="text-subtle">/ $4,000</span></div>
+              </div>
+              <div class="text-[14px] text-subtle">Reach achieved</div>
+            </div>
+            <div class="relative h-2 w-full overflow-hidden rounded-md bg-divider">
+              <div class="absolute inset-y-0 left-0 rounded-md bg-lime" style="width:12%"></div>
+            </div>
+          </article>
+
+          <!-- Card 3 -->
+          <article class="flex flex-col gap-5 rounded-lg border border-border bg-surface p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-[16px] font-medium leading-6 text-fg">JB IG Test</h3>
+              <button class="flex min-h-6 items-center rounded-lg border border-divider px-2 py-[3px] text-[12px] font-medium text-fg shadow-xs hover:bg-border/40">Details</button>
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <div class="flex items-center gap-5">
+                <div class="text-[48px] font-semibold leading-[48px] tracking-[-1.5px] text-lime">32%</div>
+                <div class="text-[16px] leading-6 text-fg">$12,620<br><span class="text-subtle">/ $15,000</span></div>
+              </div>
+              <div class="text-[14px] text-subtle">Reach achieved</div>
+            </div>
+            <div class="relative h-2 w-full overflow-hidden rounded-md bg-divider">
+              <div class="absolute inset-y-0 left-0 rounded-md bg-lime" style="width:32%"></div>
+            </div>
+          </article>
+
+          <!-- Card 4 -->
+          <article class="flex flex-col gap-5 rounded-lg border border-border bg-surface p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-[16px] font-medium leading-6 text-fg">JB TikTok 2</h3>
+              <button class="flex min-h-6 items-center rounded-lg border border-divider px-2 py-[3px] text-[12px] font-medium text-fg shadow-xs hover:bg-border/40">Details</button>
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <div class="flex items-center gap-5">
+                <div class="text-[48px] font-semibold leading-[48px] tracking-[-1.5px] text-lime">98%</div>
+                <div class="text-[16px] leading-6 text-fg">$1,620<br><span class="text-subtle">/ $3,000</span></div>
+              </div>
+              <div class="text-[14px] text-subtle">Reach achieved</div>
+            </div>
+            <div class="relative h-2 w-full overflow-hidden rounded-md bg-divider">
+              <div class="absolute inset-y-0 left-0 rounded-md bg-lime" style="width:98%"></div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- =================== TOP CREATORS =================== -->
+      <section class="flex w-full flex-col gap-5 rounded-lg border border-border bg-surface p-6">
+        <div class="flex items-center justify-between">
+          <h2 class="text-[16px] font-medium leading-6 text-fg">Top Performing Creators</h2>
+          <div class="flex items-center gap-2">
+            <div class="flex h-8 w-[212px] items-center gap-1.5 rounded-lg border border-divider px-2 shadow-xs">
+              <svg class="lucide h-4 w-4 text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              <input type="text" placeholder="Search creator" class="flex-1 bg-transparent text-[14px] text-fg outline-none placeholder:text-muted" />
+            </div>
+            <button class="flex min-h-8 items-center gap-1.5 rounded-lg border border-divider px-3 py-1.5 text-[14px] font-medium text-fg shadow-xs hover:bg-border/40">
+              <svg class="lucide h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+              Filter
+            </button>
+          </div>
+        </div>
+
+        <div class="w-full">
+          <table class="w-full border-collapse">
+            <thead>
+              <tr class="bg-border">
+                <th class="w-8 border-b border-divider px-2 py-2"></th>
+                <th class="border-b border-divider px-2 py-2 text-left text-[14px] font-medium text-fg">Name</th>
+                <th class="w-[100px] border-b border-divider px-2 py-2 text-left text-[14px] font-medium text-fg">ER</th>
+                <th class="w-[180px] border-b border-divider px-2 py-2 text-left text-[14px] font-medium text-fg">Followers</th>
+                <th class="w-[180px] border-b border-divider px-2 py-2 text-left text-[14px] font-medium text-fg">Views</th>
+                <th class="w-[180px] border-b border-divider px-2 py-2 text-left text-[14px] font-medium text-fg">Price</th>
+                <th class="w-[124px] border-b border-divider px-2 py-2"></th>
+              </tr>
+            </thead>
+            <tbody id="creators-tbody">
+              <tr>
+                <td class="border-b border-divider px-2 py-2.5"><input type="checkbox" class="h-4 w-4 shrink-0 cursor-pointer rounded-sm border border-divider bg-transparent accent-lime" /></td>
+                <td class="border-b border-divider px-2 py-2.5"><div class="flex items-center gap-2"><img src="https://i.pravatar.cc/64?img=12" alt="" class="h-8 w-8 rounded-full object-cover" /><span class="text-[14px] text-fg">Jack Alfredo</span></div></td>
+                <td class="border-b border-divider px-2 py-2.5 text-[14px] font-semibold text-lime">6%</td>
+                <td class="border-b border-divider px-2 py-2.5 text-[14px] text-fg">86 500</td>
+                <td class="border-b border-divider px-2 py-2.5 text-[14px] text-fg">100 240</td>
+                <td class="border-b border-divider px-2 py-2.5 text-[14px] text-fg">$3,200</td>
+                <td class="border-b border-divider px-2 py-2.5"><div class="flex items-center justify-end"><button class="flex h-9 w-9 items-center justify-center rounded-lg text-fg hover:bg-border/60" aria-label="Instagram"><svg class="lucide h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg></button><button class="flex h-9 w-9 items-center justify-center rounded-lg text-fg hover:bg-border/60" aria-label="YouTube"><svg class="lucide h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/><path d="m10 15 5-3-5-3z"/></svg></button><button class="flex h-9 w-9 items-center justify-center rounded-lg text-fg hover:bg-border/60" aria-label="More"><svg class="lucide h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg></button></div></td>
+              </tr>
+              <tr>
+                <td class="border-b border-divider px-2 py-2.5"><input type="checkbox" class="h-4 w-4 shrink-0 cursor-pointer rounded-sm border border-divider bg-transparent accent-lime" /></td>
+                <td class="border-b border-divider px-2 py-2.5"><div class="flex items-center gap-2"><img src="https://i.pravatar.cc/64?img=47" alt="" class="h-8 w-8 rounded-full object-cover" /><span class="text-[14px] text-fg">Maria Gonzalez</span></div></td>
+                <td class="border-b border-divider px-2 py-2.5 text-[14px] font-semibold text-lime">5.4%</td>
+                <td class="border-b border-divider px-2 py-2.5 text-[14px] text-fg">112 760</td>
+                <td class="border-b border-divider px-2 py-2.5 text-[14px] text-fg">80 125</td>
+                <td class="border-b border-divider px-2 py-2.5 text-[14px] text-fg">$5,750</td>
+                <td class="border-b border-divider px-2 py-2.5"><div class="flex items-center justify-end"><button class="flex h-9 w-9 items-center justify-center rounded-lg text-fg hover:bg-border/60" aria-label="Instagram"><svg class="lucide h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg></button><button class="flex h-9 w-9 items-center justify-center rounded-lg text-fg hover:bg-border/60" aria-label="YouTube"><svg class="lucide h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/><path d="m10 15 5-3-5-3z"/></svg></button><button class="flex h-9 w-9 items-center justify-center rounded-lg text-fg hover:bg-border/60" aria-label="More"><svg class="lucide h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg></button></div></td>
+              </tr>
+              <tr>
+                <td class="border-b border-divider px-2 py-2.5"><input type="checkbox" class="h-4 w-4 shrink-0 cursor-pointer rounded-sm border border-divider bg-transparent accent-lime" /></td>
+                <td class="border-b border-divider px-2 py-2.5"><div class="flex items-center gap-2"><img src="https://i.pravatar.cc/64?img=33" alt="" class="h-8 w-8 rounded-full object-cover" /><span class="text-[14px] text-fg">Liam O&rsquo;Brien</span></div></td>
+                <td class="border-b border-divider px-2 py-2.5 text-[14px] font-semibold text-lime">4.8%</td>
+                <td class="border-b border-divider px-2 py-2.5 text-[14px] text-fg">74 320</td>
+                <td class="border-b border-divider px-2 py-2.5 text-[14px] text-fg">92 410</td>
+                <td class="border-b border-divider px-2 py-2.5 text-[14px] text-fg">$2,900</td>
+                <td class="border-b border-divider px-2 py-2.5"><div class="flex items-center justify-end"><button class="flex h-9 w-9 items-center justify-center rounded-lg text-fg hover:bg-border/60" aria-label="Instagram"><svg class="lucide h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg></button><button class="flex h-9 w-9 items-center justify-center rounded-lg text-fg hover:bg-border/60" aria-label="YouTube"><svg class="lucide h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/><path d="m10 15 5-3-5-3z"/></svg></button><button class="flex h-9 w-9 items-center justify-center rounded-lg text-fg hover:bg-border/60" aria-label="More"><svg class="lucide h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg></button></div></td>
+              </tr>
+              <tr>
+                <td class="border-b border-divider px-2 py-2.5"><input type="checkbox" class="h-4 w-4 shrink-0 cursor-pointer rounded-sm border border-divider bg-transparent accent-lime" /></td>
+                <td class="border-b border-divider px-2 py-2.5"><div class="flex items-center gap-2"><img src="https://i.pravatar.cc/64?img=49" alt="" class="h-8 w-8 rounded-full object-cover" /><span class="text-[14px] text-fg">Sofia Tanaka</span></div></td>
+                <td class="border-b border-divider px-2 py-2.5 text-[14px] font-semibold text-lime">4.2%</td>
+                <td class="border-b border-divider px-2 py-2.5 text-[14px] text-fg">155 010</td>
+                <td class="border-b border-divider px-2 py-2.5 text-[14px] text-fg">120 870</td>
+                <td class="border-b border-divider px-2 py-2.5 text-[14px] text-fg">$6,400</td>
+                <td class="border-b border-divider px-2 py-2.5"><div class="flex items-center justify-end"><button class="flex h-9 w-9 items-center justify-center rounded-lg text-fg hover:bg-border/60" aria-label="Instagram"><svg class="lucide h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg></button><button class="flex h-9 w-9 items-center justify-center rounded-lg text-fg hover:bg-border/60" aria-label="YouTube"><svg class="lucide h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/><path d="m10 15 5-3-5-3z"/></svg></button><button class="flex h-9 w-9 items-center justify-center rounded-lg text-fg hover:bg-border/60" aria-label="More"><svg class="lucide h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg></button></div></td>
+              </tr>
+              <tr>
+                <td class="border-b border-divider px-2 py-2.5"><input type="checkbox" class="h-4 w-4 shrink-0 cursor-pointer rounded-sm border border-divider bg-transparent accent-lime" /></td>
+                <td class="border-b border-divider px-2 py-2.5"><div class="flex items-center gap-2"><img src="https://i.pravatar.cc/64?img=15" alt="" class="h-8 w-8 rounded-full object-cover" /><span class="text-[14px] text-fg">Noah Williams</span></div></td>
+                <td class="border-b border-divider px-2 py-2.5 text-[14px] font-semibold text-lime">3.9%</td>
+                <td class="border-b border-divider px-2 py-2.5 text-[14px] text-fg">60 450</td>
+                <td class="border-b border-divider px-2 py-2.5 text-[14px] text-fg">70 200</td>
+                <td class="border-b border-divider px-2 py-2.5 text-[14px] text-fg">$2,150</td>
+                <td class="border-b border-divider px-2 py-2.5"><div class="flex items-center justify-end"><button class="flex h-9 w-9 items-center justify-center rounded-lg text-fg hover:bg-border/60" aria-label="Instagram"><svg class="lucide h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg></button><button class="flex h-9 w-9 items-center justify-center rounded-lg text-fg hover:bg-border/60" aria-label="YouTube"><svg class="lucide h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/><path d="m10 15 5-3-5-3z"/></svg></button><button class="flex h-9 w-9 items-center justify-center rounded-lg text-fg hover:bg-border/60" aria-label="More"><svg class="lucide h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg></button></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  // ---- Brand selector menu ----
+  (function () {
+    const trigger = document.getElementById('brand-trigger');
+    const menu    = document.getElementById('brand-menu');
+    const nameEl  = document.getElementById('brand-trigger-name');
+    const avEl    = document.getElementById('brand-trigger-avatar');
+    const options = document.querySelectorAll('.brand-option');
+
+    function open()  { menu.classList.remove('hidden'); menu.classList.add('flex'); trigger.setAttribute('aria-expanded', 'true'); }
+    function close() { menu.classList.add('hidden');    menu.classList.remove('flex'); trigger.setAttribute('aria-expanded', 'false'); }
+    function toggle(){ menu.classList.contains('hidden') ? open() : close(); }
+
+    trigger.addEventListener('click', (e) => { e.stopPropagation(); toggle(); });
+
+    document.addEventListener('click', (e) => {
+      if (!menu.contains(e.target) && !trigger.contains(e.target)) close();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') close();
+      if ((e.metaKey || e.ctrlKey) && ['1','2','3'].includes(e.key)) {
+        e.preventDefault();
+        const opt = options[parseInt(e.key, 10) - 1];
+        if (opt) opt.click();
+      }
+    });
+
+    function selectBrand(initials, name) {
+      avEl.textContent = initials;
+      nameEl.textContent = name;
+      close();
+    }
+
+    options.forEach(opt => {
+      opt.addEventListener('click', () => selectBrand(opt.dataset.brand, opt.dataset.name));
+    });
+
+    document.getElementById('add-brand').addEventListener('click', close);
+  })();
+</script>
+
+<script>
+  // ---- Manage Widgets menu (with drag-to-reorder) ----
+  (function () {
+    const trigger = document.getElementById('widgets-trigger');
+    const menu    = document.getElementById('widgets-menu');
+    const kpiWrap = document.getElementById('kpi-cards');
+
+    function open()  { menu.classList.remove('hidden'); menu.classList.add('flex'); trigger.setAttribute('aria-expanded', 'true'); }
+    function close() { menu.classList.add('hidden');    menu.classList.remove('flex'); trigger.setAttribute('aria-expanded', 'false'); }
+    function toggle(){ menu.classList.contains('hidden') ? open() : close(); }
+
+    trigger.addEventListener('click', (e) => { e.stopPropagation(); toggle(); });
+    document.addEventListener('click', (e) => {
+      if (!menu.contains(e.target) && !trigger.contains(e.target)) close();
+    });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+
+    // Cache the original KPI card elements by widget key (so we can re-mount them in any order)
+    const kpiCards = {};
+    kpiWrap.querySelectorAll('[data-widget]').forEach(el => {
+      kpiCards[el.dataset.widget] = el;
+    });
+
+    // Rebuild KPI cards section based on the current menu order + checked state
+    function syncDashboard() {
+      // Detach everything
+      kpiWrap.innerHTML = '';
+      // Walk menu options in their current DOM order
+      const options = menu.querySelectorAll('.widget-option');
+      let firstAdded = true;
+      options.forEach(opt => {
+        const key = opt.dataset.widget;
+        const cb  = opt.querySelector('.widget-checkbox');
+        if (!cb.checked) return;
+        const card = kpiCards[key];
+        if (!card) return; // some widgets (geography, creators-count) have no card on this dashboard
+        if (!firstAdded) {
+          const sep = document.createElement('div');
+          sep.className = 'w-px self-stretch bg-divider';
+          kpiWrap.appendChild(sep);
+        }
+        kpiWrap.appendChild(card);
+        firstAdded = false;
+      });
+    }
+
+    // Checkbox -> show/hide card
+    menu.querySelectorAll('.widget-checkbox').forEach(cb => {
+      cb.addEventListener('change', (e) => { e.stopPropagation(); syncDashboard(); });
+      cb.addEventListener('click', (e) => e.stopPropagation()); // don't close the menu
+    });
+
+    // ---- Drag-and-drop reorder ----
+    let dragEl = null;
+
+    menu.querySelectorAll('.widget-option').forEach(opt => {
+      opt.addEventListener('dragstart', (e) => {
+        dragEl = opt;
+        opt.classList.add('opacity-40');
+        e.dataTransfer.effectAllowed = 'move';
+        // Firefox requires data to be set for drag to fire
+        try { e.dataTransfer.setData('text/plain', opt.dataset.widget); } catch (_) {}
+      });
+
+      opt.addEventListener('dragend', () => {
+        opt.classList.remove('opacity-40');
+        menu.querySelectorAll('.widget-option').forEach(o => o.classList.remove('border-t-2', 'border-b-2', 'border-lime'));
+        dragEl = null;
+        syncDashboard();
+      });
+
+      opt.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        if (!dragEl || dragEl === opt) return;
+        e.dataTransfer.dropEffect = 'move';
+        const rect = opt.getBoundingClientRect();
+        const after = (e.clientY - rect.top) > rect.height / 2;
+        // Visual indicator
+        menu.querySelectorAll('.widget-option').forEach(o => o.classList.remove('border-t-2', 'border-b-2', 'border-lime'));
+        opt.classList.add(after ? 'border-b-2' : 'border-t-2', 'border-lime');
+      });
+
+      opt.addEventListener('dragleave', () => {
+        opt.classList.remove('border-t-2', 'border-b-2', 'border-lime');
+      });
+
+      opt.addEventListener('drop', (e) => {
+        e.preventDefault();
+        if (!dragEl || dragEl === opt) return;
+        const rect = opt.getBoundingClientRect();
+        const after = (e.clientY - rect.top) > rect.height / 2;
+        if (after) opt.after(dragEl); else opt.before(dragEl);
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>
